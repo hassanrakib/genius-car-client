@@ -9,7 +9,6 @@ const Login = () => {
   const navigate = useNavigate();
   const from = location?.state?.from?.pathname || "/";
 
-
   const handleLogin = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -19,8 +18,24 @@ const Login = () => {
     // sign in
     signIn(email, password)
       .then((userCredential) => {
-        // redirect to the destination page
-        navigate(from, {replace: true});
+        const user = userCredential.user;
+
+        // get jwt token
+        fetch("http://localhost:5000/jwt", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: user.email }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            // save the received token from backend
+            localStorage.setItem("token", data.token);
+
+            // redirect to the destination page
+            navigate(from, { replace: true });
+          });
       })
       .catch(console.err);
   };

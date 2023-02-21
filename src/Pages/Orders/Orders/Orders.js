@@ -3,16 +3,25 @@ import { AuthContext } from "../../../contexts/AuthProvider/AuthProvider";
 import Order from "../Order/Order";
 
 const Orders = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logOut } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
 
   const url = `http://localhost:5000/orders?email=${user?.email}`;
 
   useEffect(() => {
-    fetch(url)
-      .then((res) => res.json())
+    fetch(url, {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      }
+    })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          logOut();
+        }
+        return res.json();
+      })
       .then((data) => setOrders(data));
-  }, [url]);
+  }, [url, logOut]);
 
   const handleDelete = (service_id) => {
     fetch(`http://localhost:5000/orders/${service_id}`, {
@@ -75,7 +84,7 @@ const Orders = () => {
           </tr>
         </thead>
         <tbody>
-          {orders.map((order) => (
+          {orders?.map((order) => (
             <Order
               key={order.service_id}
               order={order}

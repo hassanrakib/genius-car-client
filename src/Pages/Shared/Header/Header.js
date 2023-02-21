@@ -4,7 +4,7 @@ import logo from "../../../assets/logo.svg";
 import { AuthContext } from "../../../contexts/AuthProvider/AuthProvider";
 
 const Header = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logOut } = useContext(AuthContext);
   const navItems = (
     <>
       <li>
@@ -13,11 +13,16 @@ const Header = () => {
         </Link>
       </li>
       {user ? (
-        <li>
-          <Link className="font-semibold" to="/orders">
-            Orders
-          </Link>
-        </li>
+        <>
+          <li>
+            <Link className="font-semibold" to="/orders">
+              Orders
+            </Link>
+          </li>
+          <li>
+          <button onClick={logOut} className="btn btn-active btn-ghost">Logout</button>
+          </li>
+        </>
       ) : (
         <li>
           <Link className="font-semibold" to="/login">
